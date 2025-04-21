@@ -4,5 +4,4 @@ beautifulsoup4
 pandas
 geopy
 matplotlib
-sqlite3
 python-telegram-bot==20.7
