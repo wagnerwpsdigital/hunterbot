@@ -1,13 +1,12 @@
-# hunterbot_mvp.py – Versão funcional com busca adaptativa, aprendizado e painel
 import streamlit as st
 import sqlite3
 import pandas as pd
-from scraper_modular import buscar_em_fontes
+from scraper_modular import buscar_em_fontes  # Import necessário
 from datetime import datetime
 
 st.set_page_config(page_title="HunterBot MVP", layout="wide")
 
-# Conexão com SQLite
+# Conexão com SQLite local
 conn = sqlite3.connect("hunterbot_memoria.db", check_same_thread=False)
 cursor = conn.cursor()
 cursor.execute('''CREATE TABLE IF NOT EXISTS historico (
@@ -24,6 +23,7 @@ aba = st.sidebar.selectbox("Menu", ["Buscar Produtos", "Histórico", "Painel de 
 
 if aba == "Buscar Produtos":
     st.title("HunterBot MVP – Busca Inteligente de Produtos")
+
     termo = st.text_input("🔎 O que deseja buscar?", "Cafeteira Oster térmica")
     preco_min = st.number_input("Preço mínimo (R$)", min_value=0.0, value=0.0)
     preco_max = st.number_input("Preço máximo (R$)", min_value=0.0, value=1000.0)
@@ -47,6 +47,7 @@ if aba == "Buscar Produtos":
             st.warning("Nenhum resultado dentro da faixa de preço. Exibindo todos:")
             df = pd.DataFrame(resultados)
             st.dataframe(df)
+
         st.markdown("**Fontes utilizadas:**\n" + "\n".join([f"- {f}" for f in fontes]))
 
 elif aba == "Histórico":
