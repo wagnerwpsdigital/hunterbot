@@ -1,17 +1,17 @@
-# Etapa 1: imagem base com Python leve
 FROM python:3.10-slim
 
-# Etapa 2: diretório padrão
 WORKDIR /app
 
-# Etapa 3: copiar os arquivos do projeto para o container
-COPY . /app
+# Copiar os arquivos necessários
+COPY hunterbot_mvp.py .
+COPY scraper_modular.py .
+COPY requirements.txt .
 
-# Etapa 4: instalar as dependências via pip
+# Instalar dependências
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Etapa 5: expor a porta padrão do Streamlit
+# Expor a porta do Streamlit
 EXPOSE 8501
 
-# Etapa 6: comando que inicia o app ao rodar o container
+# Comando para executar o aplicativo
 CMD ["streamlit", "run", "hunterbot_mvp.py", "--server.port=8501", "--server.address=0.0.0.0"]
