@@ -7,7 +7,7 @@ import seaborn as sns
 import datetime
 import os
 import random
-from scraper_modular import search_mercado_livre, search_fake_sources
+#from scraper_modular import search_mercado_livre, search_fake_sources
 
 # Configuração da página
 st.set_page_config(
