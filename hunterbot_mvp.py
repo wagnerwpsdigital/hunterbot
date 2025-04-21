@@ -1,21 +1,13 @@
-import streamlit as st
+import requests
+from bs4 import BeautifulSoup
+import re
+import time
 import sqlite3
-import pandas as pd
-from scraper_modular import buscar_em_fontes
-from datetime import datetime
 
-st.set_page_config(page_title="HunterBot MVP", layout="wide")
+HEADERS = {"User-Agent": "Mozilla/5.0"}
 
-# Conexão com SQLite
 conn = sqlite3.connect("hunterbot_memoria.db", check_same_thread=False)
 cursor = conn.cursor()
-cursor.execute('''CREATE TABLE IF NOT EXISTS historico (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    termo TEXT,
-    preco_min REAL,
-    preco_max REAL,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-)''')
 cursor.execute('''CREATE TABLE IF NOT EXISTS aprendizado (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     termo TEXT,
@@ -26,83 +18,69 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS aprendizado (
 )''')
 conn.commit()
 
-# Menu lateral
-aba = st.sidebar.selectbox("Menu", ["Buscar Produtos", "Histórico", "Painel de Uso", "Aprendizado Inteligente"])
+def extrair_preco(preco_str):
+    preco_str = preco_str.replace(".", "").replace(",", ".")
+    match = re.findall(r"\d+\.\d+", preco_str)
+    return float(match[0]) if match else 0.0
 
-if aba == "Buscar Produtos":
-    st.title("HunterBot MVP – Busca Inteligente de Produtos")
-    termo = st.text_input("🔎 O que deseja buscar?", "Cafeteira Oster térmica")
-    preco_min = st.number_input("Preço mínimo (R$)", min_value=0.0, value=0.0)
-    preco_max = st.number_input("Preço máximo (R$)", min_value=0.0, value=1000.0)
+# Scraper real: Mercado Livre (Surface Web confiável)
+def mercadolivre_scraper(query):
+    url = f"https://lista.mercadolivre.com.br/{query.replace(' ', '-')}/"
+    res = requests.get(url, headers=HEADERS)
+    soup = BeautifulSoup(res.text, "html.parser")
+    itens = soup.select("li.ui-search-layout__item")[:5]
+    resultados = []
+    for item in itens:
+        nome = item.select_one(".ui-search-item__title")
+        preco = item.select_one(".price-tag-fraction")
+        link = item.select_one("a")
+        preco_valor = float(preco.text.replace(".", "")) if preco else 0.0
 
-    if st.button("Buscar Preços"):
-        st.info("Buscando em múltiplas fontes... aguarde.")
-        resultados, fontes = buscar_em_fontes(termo, minimo=10)
-        resultados_filtrados = [r for r in resultados if preco_min <= r["Preço (R$)"] <= preco_max]
+        resultados.append({
+            "Produto": nome.text if nome else "Sem nome",
+            "Preço (R$)": preco_valor,
+            "Loja": "Mercado Livre",
+            "Link": link['href'] if link else "",
+            "Fonte Confiável": True,
+            "Local": "Brasil",
+            "Fonte": "Mercado Livre"
+        })
 
-        cursor.execute("INSERT INTO historico (termo, preco_min, preco_max) VALUES (?, ?, ?)",
-                       (termo, preco_min, preco_max))
-        conn.commit()
+        cursor.execute("INSERT INTO aprendizado (termo, origem, confiavel, preco) VALUES (?, ?, ?, ?)",
+                       (query, "Mercado Livre", True, preco_valor))
 
-        if resultados_filtrados:
-            df = pd.DataFrame(resultados_filtrados)
-            st.success(f"{len(df)} resultados encontrados!")
-            st.dataframe(df)
-            st.download_button("⬇ Baixar resultados", df.to_csv(index=False).encode('utf-8'), "resultados.csv")
-        else:
-            st.warning("Nenhum resultado dentro da faixa de preço. Exibindo todos:")
-            df = pd.DataFrame(resultados)
-            st.dataframe(df)
-        st.markdown("**Fontes utilizadas:**\n" + "\n".join([f"- {f}" for f in fontes]))
+    conn.commit()
+    return resultados
 
-elif aba == "Histórico":
-    st.title("📜 Histórico de Pesquisas")
-    df = pd.read_sql_query("SELECT * FROM historico ORDER BY timestamp DESC", conn)
-    st.dataframe(df)
-    st.download_button("⬇ Baixar histórico", df.to_csv(index=False).encode('utf-8'), "historico.csv")
+# Fonte não confiável simulada (Deep/Fake)
+def fonte_simulada(query):
+    simulados = []
+    for i in range(5):
+        preco_simulado = 250 + i * 45
+        simulados.append({
+            "Produto": f"{query} Simulado {i+1}",
+            "Preço (R$)": preco_simulado,
+            "Loja": "Shopee/Facebook/WhatsX",
+            "Link": "https://example.com/produto",
+            "Fonte Confiável": False,
+            "Local": "Desconhecido",
+            "Fonte": "Fonte Simulada (Deep/Fake)"
+        })
 
-elif aba == "Painel de Uso":
-    st.title("📈 Painel de Tendências e Comportamento")
-    df = pd.read_sql_query("SELECT * FROM historico", conn)
-    if df.empty:
-        st.warning("Nenhuma pesquisa registrada ainda.")
-    else:
-        df["timestamp"] = pd.to_datetime(df["timestamp"])
-        df["Data"] = df["timestamp"].dt.date
-        st.subheader("🔝 Termos mais buscados")
-        st.bar_chart(df["termo"].value_counts().head(10))
+        cursor.execute("INSERT INTO aprendizado (termo, origem, confiavel, preco) VALUES (?, ?, ?, ?)",
+                       (query, "Simulada", False, preco_simulado))
 
-        st.subheader("📅 Volume diário de buscas")
-        st.line_chart(df.groupby("Data").size())
+    conn.commit()
+    return simulados
 
-        st.subheader("💰 Faixas de preço mais usadas")
-        st.line_chart(df[["preco_min", "preco_max"]])
+# Busca unificada
 
-elif aba == "Aprendizado Inteligente":
-    st.title("🧠 Painel de Aprendizado da Ferramenta")
-    df_aprend = pd.read_sql_query("SELECT * FROM aprendizado", conn)
-    if df_aprend.empty:
-        st.warning("Ainda não há dados de aprendizado registrados.")
-    else:
-        df_aprend["timestamp"] = pd.to_datetime(df_aprend["timestamp"])
-        df_aprend["Data"] = df_aprend["timestamp"].dt.date
-
-        st.subheader("📊 Termos mais registrados")
-        st.bar_chart(df_aprend["termo"].value_counts().head(10))
-
-        st.subheader("📍 Origem das informações")
-        st.bar_chart(df_aprend["origem"].value_counts())
-
-        st.subheader("📈 Preços por tipo de fonte")
-        confiaveis = df_aprend[df_aprend["confiavel"] == 1]
-        nao_confiaveis = df_aprend[df_aprend["confiavel"] == 0]
-
-        st.write("**Preço médio - Fontes confiáveis**")
-        st.metric("Preço Médio (R$)", f"{confiaveis['preco'].mean():.2f}")
-
-        st.write("**Preço médio - Fontes não confiáveis**")
-        st.metric("Preço Médio (R$)", f"{nao_confiaveis['preco'].mean():.2f}")
-
-        st.subheader("🗂️ Todos os registros de aprendizado")
-        st.dataframe(df_aprend)
-        st.download_button("⬇ Baixar base de aprendizado", df_aprend.to_csv(index=False).encode('utf-8'), "aprendizado.csv")
+def buscar_em_fontes(query, minimo=10):
+    resultados_surface = mercadolivre_scraper(query)
+    resultados_fake = fonte_simulada(query)
+    resultados = resultados_surface + resultados_fake
+    fontes = [
+        f"Mercado Livre → {len(resultados_surface)} resultados",
+        f"Simulados (Deep/Fake) → {len(resultados_fake)} resultados"
+    ]
+    return resultados[:minimo], fontes
