@@ -32,4 +32,4 @@ def google_shopping_scraper(query):
 
 def buscar_em_fontes(query, minimo=10):
     resultados = google_shopping_scraper(query)
-    return resultados[:minimo], [f"Google Shopping → {len(resultados)} resultados"]# Scrapers modulares por fonte (resumo)
+    return resultados[:minimo], [f"Google Shopping → {len(resultados)} resultados"]
