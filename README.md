@@ -1,2 +1,3 @@
-# hunterbot
-Sistema inteligente de busca de produtos com scraping e bot
+# HunterBot – Agente de Busca Inteligente
+
+Documentação resumida do projeto.

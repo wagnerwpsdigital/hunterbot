@@ -1,0 +1,1 @@
+# MVP Streamlit principal (resumo)

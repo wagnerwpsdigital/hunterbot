@@ -1,0 +1,1 @@
+# Scrapers modulares por fonte (resumo)
