@@ -1,7 +1,7 @@
-streamlit
-requests
-beautifulsoup4
-pandas
-geopy
-matplotlib
-python-telegram-bot==20.7
+streamlit==1.36.0
+pandas==2.2.0
+matplotlib==3.8.2
+seaborn==0.13.1
+requests==2.31.0
+beautifulsoup4==4.12.2
+python-dotenv==1.0.1
