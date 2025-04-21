@@ -53,6 +53,7 @@ if aba == "Buscar Produtos":
             st.warning("Nenhum resultado dentro da faixa de preço. Exibindo todos:")
             df = pd.DataFrame(resultados)
             st.dataframe(df)
+
         st.markdown("**Fontes utilizadas:**\n" + "\n".join([f"- {f}" for f in fontes]))
 
 elif aba == "Histórico":
@@ -71,10 +72,8 @@ elif aba == "Painel de Uso":
         df["Data"] = df["timestamp"].dt.date
         st.subheader("🔝 Termos mais buscados")
         st.bar_chart(df["termo"].value_counts().head(10))
-
         st.subheader("📅 Volume diário de buscas")
         st.line_chart(df.groupby("Data").size())
-
         st.subheader("💰 Faixas de preço mais usadas")
         st.line_chart(df[["preco_min", "preco_max"]])
 
@@ -86,23 +85,17 @@ elif aba == "Aprendizado Inteligente":
     else:
         df_aprend["timestamp"] = pd.to_datetime(df_aprend["timestamp"])
         df_aprend["Data"] = df_aprend["timestamp"].dt.date
-
         st.subheader("📊 Termos mais registrados")
         st.bar_chart(df_aprend["termo"].value_counts().head(10))
-
         st.subheader("📍 Origem das informações")
         st.bar_chart(df_aprend["origem"].value_counts())
-
         st.subheader("📈 Preços por tipo de fonte")
         confiaveis = df_aprend[df_aprend["confiavel"] == 1]
         nao_confiaveis = df_aprend[df_aprend["confiavel"] == 0]
-
         st.write("**Preço médio - Fontes confiáveis**")
         st.metric("Preço Médio (R$)", f"{confiaveis['preco'].mean():.2f}")
-
         st.write("**Preço médio - Fontes não confiáveis**")
         st.metric("Preço Médio (R$)", f"{nao_confiaveis['preco'].mean():.2f}")
-
         st.subheader("🗂️ Todos os registros de aprendizado")
         st.dataframe(df_aprend)
         st.download_button("⬇ Baixar base de aprendizado", df_aprend.to_csv(index=False).encode('utf-8'), "aprendizado.csv")
