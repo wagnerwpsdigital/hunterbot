@@ -1,20 +1,17 @@
 # hunterbot_mvp.py
 import streamlit as st
-
 # ⛳️ DEVE VIR LOGO APÓS O IMPORT DO STREAMLIT
 st.set_page_config(
     page_title="HunterBot - Agente de Inteligência Digital",
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
 # Agora os demais imports e módulos
 from auth import login, registrar
 import pandas as pd
 from db_connector import salvar_dataframe, ler_tabela
 ...
 # Agora pode começar os outros comandos Streamlit
-st.sidebar.title("🔐 Login / Registro")
 import pandas as pd
 import sqlite3
 import matplotlib.pyplot as plt
@@ -49,12 +46,6 @@ def search_mercado_livre(query, min_price=None, max_price=None):
     
 def search_fake_sources(query, min_price=None, max_price=None):
     return []  # Retorna lista vazia temporariamente
-# Configuração da página
-st.set_page_config(
-    page_title="HunterBot - Agente de Inteligência Digital",
-    page_icon="🔍",
-    layout="wide",
-)
 # Inicialização do banco de dados
 def init_db():
     conn = sqlite3.connect('hunterbot.db')
