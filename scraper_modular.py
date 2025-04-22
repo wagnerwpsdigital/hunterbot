@@ -7,7 +7,72 @@ import time
 import re
 import unicodedata
 from urllib.parse import quote
-# Lista de fontes simuladas para a deep/fake web
+# Linha 10 original (comentada)
+# from scraper_modular import search_mercado_livre, search_fake_sources
+
+# Implementação substituta da função search_mercado_livre
+def search_mercado_livre(query, min_price=None, max_price=None):
+    import requests
+    from bs4 import BeautifulSoup
+    
+    # Formatar a URL de busca
+    query = query.replace(' ', '+')
+    url = f"https://lista.mercadolivre.com.br/{query}"
+    
+    # Adicionar filtros de preço, se fornecidos
+    params = {}
+    if min_price is not None and max_price is not None:
+        params['price'] = f"{min_price}-{max_price}"
+    
+    # Fazer a requisição
+    try:
+        response = requests.get(url, params=params)
+        if response.status_code != 200:
+            return []
+        
+        # Analisar o HTML
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Extrair produtos (este é um exemplo simples - ajuste conforme necessário)
+        results = []
+        products = soup.select('.ui-search-result__wrapper')
+        
+        for product in products[:10]:  # Limitar a 10 resultados
+            title_tag = product.select_one('.ui-search-item__title')
+            price_tag = product.select_one('.price-tag-fraction')
+            link_tag = product.select_one('.ui-search-link')
+            
+            if title_tag and price_tag and link_tag:
+                title = title_tag.text.strip()
+                price = price_tag.text.strip().replace('.', '').replace(',', '.')
+                link = link_tag['href']
+                
+                results.append({
+                    'title': title,
+                    'price': float(price),
+                    'link': link
+                })
+        
+        return results
+    except Exception as e:
+        print(f"Erro ao buscar no Mercado Livre: {e}")
+        return []
+
+# Implementação substituta para search_fake_sources
+def search_fake_sources(query, min_price=None, max_price=None):
+    # Implementação simplificada - retorna dados fictícios
+    return [
+        {
+            'title': f"Produto fictício 1 para '{query}'",
+            'price': 199.99,
+            'link': "https://exemplo.com/produto1"
+        },
+        {
+            'title': f"Produto fictício 2 para '{query}'",
+            'price': 249.99,
+            'link': "https://exemplo.com/produto2"
+        }
+    ]
 FAKE_SOURCES = [
     "DarkMarket",
     "ShadowBazaar",
