@@ -1,9 +1,17 @@
 # hunterbot_mvp.py
-import streamlit as st, st.set_page_config(
+import streamlit as st
+from auth import login, registrar
+import pandas as pd
+...
+
+st.set_page_config(
     page_title="HunterBot - Agente de Inteligência Digital",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Agora pode começar os outros comandos Streamlit
+st.sidebar.title("🔐 Login / Registro")
 import pandas as pd
 import sqlite3
 import matplotlib.pyplot as plt
