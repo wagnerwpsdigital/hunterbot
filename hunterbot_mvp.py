@@ -1,22 +1,18 @@
 # hunterbot_mvp.py
 import streamlit as st
 
+# ⛳️ DEVE VIR LOGO APÓS O IMPORT DO STREAMLIT
 st.set_page_config(
     page_title="HunterBot - Agente de Inteligência Digital",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Agora, os outros imports podem vir depois
+# Agora os demais imports e módulos
 from auth import login, registrar
 import pandas as pd
+from db_connector import salvar_dataframe, ler_tabela
 ...
-st.set_page_config(
-    page_title="HunterBot - Agente de Inteligência Digital",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
 # Agora pode começar os outros comandos Streamlit
 st.sidebar.title("🔐 Login / Registro")
 import pandas as pd
