@@ -8,8 +8,7 @@ import re
 import unicodedata
 from urllib.parse import quote
 # Linha 10 original (comentada)
-# from scraper_modular import search_mercado_livre, search_fake_sources
-
+from scraper_modular import buscar_em_fontes
 # Implementação substituta da função search_mercado_livre
 def search_mercado_livre(query, min_price=None, max_price=None):
     import requests
