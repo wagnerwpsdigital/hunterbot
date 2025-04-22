@@ -8,19 +8,22 @@ import datetime
 import os
 import random
 #from scraper_modular import search_mercado_livre, search_fake_sources
-
+# Funções substitutas temporárias
+def search_mercado_livre(query, min_price=None, max_price=None):
+    return []  # Retorna lista vazia temporariamente
+    
+def search_fake_sources(query, min_price=None, max_price=None):
+    return []  # Retorna lista vazia temporariamente
 # Configuração da página
 st.set_page_config(
     page_title="HunterBot - Agente de Inteligência Digital",
     page_icon="🔍",
     layout="wide",
 )
-
 # Inicialização do banco de dados
 def init_db():
     conn = sqlite3.connect('hunterbot.db')
-    c = conn.cursor()
-    
+    c = conn.cursor()   
     # Tabela de pesquisas
     c.execute('''
     CREATE TABLE IF NOT EXISTS searches (
