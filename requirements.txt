@@ -5,3 +5,5 @@ seaborn==0.13.1
 requests==2.31.0
 beautifulsoup4==4.12.2
 python-dotenv==1.0.1
+sqlalchemy
+psycopg2-binary
