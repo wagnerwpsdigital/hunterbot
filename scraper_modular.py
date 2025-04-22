@@ -71,25 +71,34 @@ def mercadolivre_scraper(query):
     conn.commit()
     return resultados
 
+import random
+
 def fonte_simulada(query):
-    simulados = []
+    lojas_fake = ["Shopee", "Facebook Marketplace", "WhatsApp Vendas", "OLX", "Loja XYZ"]
+    resultados = []
+
     for i in range(5):
-        preco_simulado = 250 + i * 45
-        simulados.append({
-            "Produto": f"{query} Simulado {i+1}",
+        preco_simulado = round(random.uniform(50.0, 500.0), 2)
+        loja = random.choice(lojas_fake)
+        produto_simulado = f"{query} - {loja} Edição Especial"
+
+        resultados.append({
+            "Produto": produto_simulado,
             "Preço (R$)": preco_simulado,
-            "Loja": "Shopee/Facebook/WhatsX",
+            "Loja": loja,
             "Link": "https://example.com/produto",
             "Fonte Confiável": False,
             "Local": "Desconhecido",
             "Fonte": "Fonte Simulada (Deep/Fake)"
         })
 
-        cursor.execute("INSERT INTO aprendizado (termo, origem, confiavel, preco) VALUES (?, ?, ?, ?)",
-                       (query, "Simulada", False, preco_simulado))
+        cursor.execute(
+            "INSERT INTO aprendizado (termo, origem, confiavel, preco) VALUES (?, ?, ?, ?)",
+            (query, loja, False, preco_simulado)
+        )
 
     conn.commit()
-    return simulados
+    return resultados
 
 def buscar_em_fontes(query, minimo=10):
     resultados_surface = mercadolivre_scraper(query)
