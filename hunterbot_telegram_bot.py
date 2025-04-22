@@ -10,7 +10,15 @@ from scraper_modular import search_mercado_livre, search_fake_sources
 import matplotlib.pyplot as plt
 import io
 import time
+from db_connector import salvar_dataframe, ler_tabela
 
+# Exemplo: salvar uma pesquisa no histórico
+df_novo = pd.DataFrame([{
+    "termo": termo,
+    "preco_min": preco_min,
+    "preco_max": preco_max
+}])
+salvar_dataframe(df_novo, "historico")
 # Carregar variáveis de ambiente de um arquivo .env
 load_dotenv()
 
