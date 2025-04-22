@@ -8,6 +8,26 @@ import datetime
 import os
 import random
 from scraper_modular import buscar_em_fontes
+from auth import login, registrar
+st.sidebar.title("🔐 Login / Registro")
+modo = st.sidebar.radio("Acesso", ["Login", "Registrar"])
+email = st.sidebar.text_input("E-mail")
+senha = st.sidebar.text_input("Senha", type="password")
+if modo == "Login":
+    if st.sidebar.button("Entrar"):
+        result = login(email, senha)
+        if result.user:
+            st.session_state["usuario_logado"] = result.user.email
+            st.success(f"Bem-vindo, {result.user.email}")
+        else:
+            st.error("Login inválido")
+elif modo == "Registrar":
+    if st.sidebar.button("Criar conta"):
+        result = registrar(email, senha)
+        if result.user:
+            st.success("Conta criada. Faça login agora.")
+        else:
+            st.error("Erro ao registrar")
 # Funções substitutas temporárias
 def search_mercado_livre(query, min_price=None, max_price=None):
     return []  # Retorna lista vazia temporariamente
