@@ -26,12 +26,29 @@ def extrair_preco(preco_str):
     return float(match[0]) if match else 0.0
 
 def mercadolivre_scraper(query):
-    url = f"https://lista.mercadolivre.com.br/{query.replace(' ', '-')}/"
-    res = requests.get(url, headers=HEADERS)
-    soup = BeautifulSoup(res.text, "html.parser")
-    itens = soup.select("li.ui-search-layout__item")[:5]
+    url = f"https://api.mercadolibre.com/sites/MLB/search?q={query}"
+    res = requests.get(url)
+    if res.status_code != 200:
+        return []
+    data = res.json()
     resultados = []
-
+    for item in data.get("results", [])[:5]:
+        resultados.append({
+            "Produto": item.get("title", "Sem nome"),
+            "Preço (R$)": float(item.get("price", 0.0)),
+            "Loja": "Mercado Livre API",
+            "Link": item.get("permalink", ""),
+            "Fonte Confiável": True,
+            "Local": item.get("address", {}).get("state_name", "Desconhecido"),
+            "Fonte": "Mercado Livre API"
+        })
+        # Registro no banco para aprendizado
+        cursor.execute(
+            "INSERT INTO aprendizado (termo, origem, confiavel, preco) VALUES (?, ?, ?, ?)",
+            (query, "Mercado Livre API", True, item.get("price", 0.0))
+        )
+    conn.commit()
+    return resultados
     for item in itens:
         nome = item.select_one(".ui-search-item__title")
         preco = item.select_one(".price-tag-fraction")
