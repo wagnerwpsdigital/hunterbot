@@ -9,7 +9,7 @@
 import pandas as pd\
 \
 # \uc0\u55357 \u56592  Insira sua string de conex\'e3o abaixo\
-SUPABASE_DB_URL = "postgresql://postgres:SUA_SENHA_AQUI@db.fdwljwzievxxaanpfgvb.supabase.co:5432/postgres"\
+SUPABASE_DB_URL = "postgresql://postgres:Wps060713@@@@db.fdwljwzievxxaanpfgvb.supabase.co:5432/postgres"\
 \
 # Cria o motor de conex\'e3o\
 engine = create_engine(SUPABASE_DB_URL)\
