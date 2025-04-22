@@ -7,7 +7,7 @@ import seaborn as sns
 import datetime
 import os
 import random
-#from scraper_modular import search_mercado_livre, search_fake_sources
+from scraper_modular import search_mercado_livre, search_fake_sources
 # Funções substitutas temporárias
 def search_mercado_livre(query, min_price=None, max_price=None):
     return []  # Retorna lista vazia temporariamente
