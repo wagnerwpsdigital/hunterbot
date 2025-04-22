@@ -1,7 +1,7 @@
 from supabase import create_client, Client
 
 # 🔐 Substitua pelos dados reais do seu projeto Supabase
-SUPABASE_URL = "db.fdwljwzievxxaanpfgvb.supabase.co"
+SUPABASE_URL = "https://fdwljwzievxxaanpfgvb.supabase.co"
 SUPABASE_KEY = "Wps060713@@@"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
