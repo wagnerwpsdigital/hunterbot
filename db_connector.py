@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 
 # Substitua com sua conexão real
-SUPABASE_DB_URL = "postgresql://postgres:SUA_SENHA@db.xxx.supabase.co:5432/postgres"
+SUPABASE_DB_URL = "postgresql://postgres:[GdHK0TUtEm7bQVKS]@db.fdwljwzievxxaanpfgvb.supabase.co:5432/postgres"
 
 engine = create_engine(SUPABASE_DB_URL)
 
